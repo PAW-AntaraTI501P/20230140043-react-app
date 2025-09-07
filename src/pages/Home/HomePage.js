@@ -1,88 +1,153 @@
 // src/pages/HomePage.js
 
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const HomePage = () => {
-  // --- STYLES ---
+  const navigate = useNavigate();
+  const isLoggedIn = !!localStorage.getItem("token");
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/");
+  };
+
+  // 🎨 Styles
   const containerStyle = {
     display: "flex",
-    flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
     height: "100vh",
-    backgroundColor: "#282c34",
+    background: "linear-gradient(135deg, #1e3c72, #2a5298)", // gradient biru
+    fontFamily: '"Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+    padding: "20px",
     color: "white",
-    fontFamily:
-      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"',
   };
 
-  const contentWrapperStyle = {
+  const cardStyle = {
     textAlign: "center",
     padding: "40px",
     borderRadius: "15px",
-    backgroundColor: "#3a3f4a", // Warna sedikit lebih terang untuk kontras
-    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.3)",
+    backgroundColor: "rgba(255,255,255,0.1)",
+    boxShadow: "0 8px 30px rgba(0,0,0,0.3)",
+    backdropFilter: "blur(10px)",
+    width: "100%",
+    maxWidth: "500px",
   };
 
   const headingStyle = {
-    fontSize: "3.5em", // Lebih besar dan menonjol
-    fontWeight: "bold",
-    margin: "0 0 15px 0",
-    color: "#61dafb", // Menggunakan warna aksen untuk judul
-    textShadow: "0 2px 10px rgba(97, 218, 251, 0.3)", // Efek glow
+    fontSize: "2.2em",
+    marginBottom: "10px",
+    color: "#ffffff",
+    textShadow: "0 2px 10px rgba(0,0,0,0.3)",
   };
 
-  const paragraphStyle = {
+  const subHeadingStyle = {
+    marginBottom: "20px",
     fontSize: "1.2em",
-    maxWidth: "500px", // Batasi lebar agar mudah dibaca
-    lineHeight: "1.6",
-    color: "#c7c9ce", // Warna abu-abu terang agar tidak terlalu mencolok
-    marginBottom: "30px",
+    color: "#e0e0e0",
   };
 
   const buttonStyle = {
     display: "inline-block",
-    padding: "15px 30px",
-    fontSize: "1.2em",
+    padding: "12px 20px",
+    fontSize: "1.1em",
     fontWeight: "bold",
+    margin: "10px 5px",
     backgroundColor: "#61dafb",
     color: "#282c34",
     border: "none",
-    borderRadius: "10px",
+    borderRadius: "8px",
     cursor: "pointer",
     textDecoration: "none",
-    boxShadow: "0 4px 15px rgba(97, 218, 251, 0.2)",
-    transition: "transform 0.2s ease, box-shadow 0.2s ease", // Transisi untuk hover
+    transition: "all 0.3s ease",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
   };
 
-  // --- JSX ---
+  const buttonHover = {
+    backgroundColor: "#4fa3d7",
+    transform: "scale(1.05)",
+  };
+
+  // Ambil nama user
+  let userName = null;
+  if (isLoggedIn) {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      userName = user?.name
+        ? user.name
+        : user?.email
+        ? user.email.split("@")[0]
+        : null;
+    } catch {}
+  }
 
   return (
     <div style={containerStyle}>
-      <div style={contentWrapperStyle}>
-        <h1 style={headingStyle}>Aplikasi Todo List</h1>
-        <p style={paragraphStyle}>
+      <div style={cardStyle}>
+        <h1 style={headingStyle}>Selamat Datang di Aplikasi Todo List</h1>
+        {userName && (
+          <h2 style={subHeadingStyle}>Halo, {userName}! 👋</h2>
+        )}
+        <p style={{ marginBottom: "30px" }}>
           Kelola semua tugas Anda dengan mudah dan efisien.
         </p>
+
         <Link
           to="/todos"
-          style={buttonStyle}
-          // Efek hover sederhana dengan JavaScript
-          onMouseOver={(e) => {
-            e.currentTarget.style.transform = "translateY(-3px)";
-            e.currentTarget.style.boxShadow =
-              "0 8px 25px rgba(97, 218, 251, 0.4)";
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.transform = "translateY(0)";
-            e.currentTarget.style.boxShadow =
-              "0 4px 15px rgba(97, 218, 251, 0.2)";
-          }}
+          style={{ ...buttonStyle }}
+          onMouseEnter={(e) =>
+            Object.assign(e.target.style, buttonHover)
+          }
+          onMouseLeave={(e) =>
+            Object.assign(e.target.style, buttonStyle)
+          }
         >
-          Lihat Daftar Todo
+          📋 Lihat Daftar Todo
         </Link>
+
+        {isLoggedIn ? (
+          <button
+            style={buttonStyle}
+            onClick={handleLogout}
+            onMouseEnter={(e) =>
+              Object.assign(e.target.style, buttonHover)
+            }
+            onMouseLeave={(e) =>
+              Object.assign(e.target.style, buttonStyle)
+            }
+          >
+            🚪 Logout
+          </button>
+        ) : (
+          <>
+            <Link
+              to="/login"
+              style={buttonStyle}
+              onMouseEnter={(e) =>
+                Object.assign(e.target.style, buttonHover)
+              }
+              onMouseLeave={(e) =>
+                Object.assign(e.target.style, buttonStyle)
+              }
+            >
+              Login
+            </Link>
+            <Link
+              to="/register"
+              style={buttonStyle}
+              onMouseEnter={(e) =>
+                Object.assign(e.target.style, buttonHover)
+              }
+              onMouseLeave={(e) =>
+                Object.assign(e.target.style, buttonStyle)
+              }
+            >
+             Register
+            </Link>
+          </>
+        )}
       </div>
     </div>
   );
